@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ZombomboUpdater.Core/ZombomboUpdater.Core.csproj" />
+    <Project Path="src/ZombomboUpdater/ZombomboUpdater.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ZombomboUpdater.Tests/ZombomboUpdater.Tests.csproj" />
+  </Folder>
+</Solution>

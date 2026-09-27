@@ -1,0 +1,7 @@
+**/bin/
+**/obj/
+**/*.csproj.user
+publish/
+*.zip
+*.sha256
+.vs/
