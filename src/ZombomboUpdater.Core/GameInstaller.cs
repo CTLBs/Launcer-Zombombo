@@ -23,6 +23,9 @@ public sealed class GameInstaller(HttpClient http)
         var destination = Path.GetFullPath(installDirectory);
         if (destination == Path.GetPathRoot(destination))
             throw new InvalidOperationException("Disk kökünü yükleme klasörü olarak seçmeyin.");
+        if (destination.TrimEnd(Path.DirectorySeparatorChar).Equals(
+            AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Güncelleyicinin bulunduğu klasör oyun klasörü olamaz.");
         Directory.CreateDirectory(destination);
         var workspace = Path.Combine(destination, ".zombombo-work-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(workspace);
