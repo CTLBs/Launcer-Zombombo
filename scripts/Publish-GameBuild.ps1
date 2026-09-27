@@ -30,9 +30,21 @@ if (-not $stageFull.StartsWith($tempRoot.TrimEnd([IO.Path]::DirectorySeparatorCh
 }
 New-Item -ItemType Directory -Path $stageFull | Out-Null
 try {
+    $payload = Join-Path $stageFull 'payload'
+    New-Item -ItemType Directory -Path $payload | Out-Null
+    $sourcePrefix = $source.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+    foreach ($file in Get-ChildItem -LiteralPath $source -Recurse -File -Force) {
+        $relative = $file.FullName.Substring($sourcePrefix.Length)
+        if ($relative -match '(^|[\\/])[^\\/]*DoNotShip([\\/]|$)' -or $file.Extension -ieq '.log') {
+            continue
+        }
+        $target = Join-Path $payload $relative
+        New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
+        Copy-Item -LiteralPath $file.FullName -Destination $target -Force
+    }
     $zip = Join-Path $stageFull 'game.zip'
     $checksum = Join-Path $stageFull 'game.zip.sha256'
-    [IO.Compression.ZipFile]::CreateFromDirectory($source, $zip, [IO.Compression.CompressionLevel]::Optimal, $false)
+    [IO.Compression.ZipFile]::CreateFromDirectory($payload, $zip, [IO.Compression.CompressionLevel]::Optimal, $false)
     $hash = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
     [IO.File]::WriteAllText($checksum, "$hash  game.zip`n")
     gh release create $Version $zip $checksum --repo $Repository --title $Version --notes "Game build $Version" --latest
